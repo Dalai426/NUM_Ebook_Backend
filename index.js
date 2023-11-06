@@ -5,15 +5,13 @@ const app = express();
 const errorHandlerMiddleWare=require("./middleware/errorHandlerMiddleWare")
 //router
 const authRouter=require("./router/authRouter");
+const epubFileRouter=require("./router/epubRouter");
+
 app.use("/api/auth", authRouter);
+app.use("/", epubFileRouter);
 
 
 app.use(errorHandlerMiddleWare);
-app.get("/view",(req, res) => {
-
-   res.send(hr);
-
-});
 
 
 const port = process.env.PORT || 3000;
