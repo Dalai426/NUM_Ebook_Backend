@@ -17,7 +17,7 @@ module.exports = {
     },
     ERR_TOKEN: {
         key: "ERR_TOKEN",
-        message: "Өөө, Уучлаарай эдгээр ном нь МУИС-ын OUTLOOK эрхээр л нэвтэрч орно шүү хөөрхнөө !!!",
+        message: "Өөө, Уучлаарай одтой ном нь МУИС-ын OUTLOOK эрхээр л нэвтэрч орно шүү хөөрхнөө !!!",
     },
     ERR_INTERNAL:{
         key: "ERR_INTERNAL",
@@ -26,5 +26,9 @@ module.exports = {
     EMPTY_DATA:{
         key: "EMPTY_DATA",
         message: "Өөө, Хайлт алдаатай байна !!!",
+    },
+    ERR:{
+        key: "ERR",
+        message: "Өөө, Алдаа гарлаа !!!",
     }
 }
