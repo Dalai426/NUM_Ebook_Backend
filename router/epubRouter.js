@@ -40,7 +40,8 @@ router.post("/upload", upload.fields([{ name: 'epub' }, { name: 'image' }]), asy
       name: info.name,
       author: info.author,
       category: info.category,
-      prime: info.prime
+      prime: info.prime,
+      translated:info.translated
     });
     const savedBook = await book.save();
     res.json({ success: true, id: savedBook.id });
@@ -90,7 +91,8 @@ router.get("/epub/:id", async (req, res, next) => {
       }
     }
     const epub = await EPUB.findById(book.file);
-    res.send(epub);
+    res.set('Content-Type', 'application/epub+zip');
+    res.send(epub.data);
   } catch (error) {
     return next(ApiError.badRequest(errorM.EMPTY_DATA));
   }
