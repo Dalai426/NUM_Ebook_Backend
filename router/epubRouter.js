@@ -8,7 +8,7 @@ const Book = require('../models/bookInfo')
 const { verifyTokens } = require("../security/authenticate");
 const ApiError = require("../error/apiError");
 const errorM = require("../error/ErrorM");
-const ApiFilters=require("../utils/ApiFilters")
+const ApiFilters = require("../utils/ApiFilters")
 
 require('dotenv').config()
 
@@ -41,7 +41,7 @@ router.post("/upload", upload.fields([{ name: 'epub' }, { name: 'image' }]), asy
       author: info.author,
       category: info.category,
       prime: info.prime,
-      translated:info.translated
+      translated: info.translated
     });
     const savedBook = await book.save();
     res.json({ success: true, id: savedBook.id });
@@ -56,16 +56,23 @@ router.post("/upload", upload.fields([{ name: 'epub' }, { name: 'image' }]), asy
 router.post("/epubs", async (req, res, next) => {
   try {
 
-    const resPerPage=req.body.resPerPage||20;
+    const resPerPage = req.body.resPerPage || 20;
     console.log(req.body.resPerPage)
-    const apiFilters=await new ApiFilters(Book, req.query).search();
-    let books_filtered=await apiFilters.query;
-    const filtered_count=books_filtered.length;
-    
+    const apiFilters = await new ApiFilters(Book, req.query).search();
+    let books_filtered = await apiFilters.query;
+    const filtered_count = books_filtered.length;
     apiFilters.pagination(resPerPage);
+    books_filtered = await apiFilters.query.clone();
 
-    books_filtered=await apiFilters.query.clone();
-    res.status(200).json({ books:books_filtered, resPerPage, filtered_count});
+    let newBooks;
+    if (!req.query.keyword) {
+      newBooks=await Book.find()
+        .sort({ createdAt: -1 })
+        .limit(7).clone();
+    }
+
+
+    res.status(200).json({ books: books_filtered, resPerPage, filtered_count, newBooks });
   } catch (error) {
     console.log(error)
     return next(ApiError.badRequest(errorM.ERR));
