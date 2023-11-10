@@ -18,7 +18,7 @@ class ApiFilters {
                 ]
             } : 
         queryCopy;
-        this.query = this.query.find({ ...keyword });
+        this.query = this.query.find({ ...keyword }).sort({createdAt:-1});
         return this;
     }
 
