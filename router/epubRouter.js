@@ -10,7 +10,7 @@ const ApiError = require("../error/apiError");
 const errorM = require("../error/ErrorM");
 const ApiFilters = require("../utils/ApiFilters")
 
-require('dotenv').config()
+require('dotenv').config({path:`.env.${process.env.NODE_ENV}`})
 
 // MongoDB connection
 mongoose.connect(process.env.DB)
