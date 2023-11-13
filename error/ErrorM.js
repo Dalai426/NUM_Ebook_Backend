@@ -30,5 +30,9 @@ module.exports = {
     ERR:{
         key: "ERR",
         message: "Өөө, Алдаа гарлаа !!!",
+    },
+    RE_LOGIN:{
+        key: "RE_LOGIN",
+        message: "Өөө, Дахин нэвтрэнэ үү !!!",
     }
 }

@@ -91,10 +91,18 @@ router.get("/epub/:id", async (req, res, next) => {
       return next(ApiError.badRequest(errorM.EMPTY_DATA));
     }
 
+    if(!token){
+      return next(ApiError.badRequest(errorM.ERR_TOKEN));
+    }
     if (book.prime) {
       const verify_res = verifyTokens(token);
-      if (!verify_res) {
-        return next(ApiError.badRequest(errorM.ERR_TOKEN));
+
+      if (verify_res.error) {
+        if(verify_res.err.name==="TokenExpiredError"){
+          return next(ApiError.badRequest(errorM.RE_LOGIN));
+        }else{
+          return next(ApiError.badRequest(errorM.ERR));
+        }
       }
     }
     const epub = await EPUB.findById(book.file);
