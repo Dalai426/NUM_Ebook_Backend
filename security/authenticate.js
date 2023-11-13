@@ -59,9 +59,9 @@ const verifyTokens = (token) => {
   
   return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decodedToken)=>{
     if(err){
-      return null;
+      return {err, error:true};
     }else{
-      return decodedToken;
+      return {decodedToken, error:false};
     }
   });
 };
