@@ -6,11 +6,12 @@ const { sendMail } = require("../utils/Mail");
 
 const ApiError = require("../error/apiError");
 const errorM = require("../error/ErrorM");
+const jwt = require('jsonwebtoken');
 
-const {createUserTokens} = require("../security/authenticate")
 
+const { createUserTokens, verifyTokens, verifyRefreshToken, signAccessToken } = require("../security/authenticate")
 
-router.use(express.json()); 
+router.use(express.json());
 
 router.post("/login/:email", async (req, res, next) => {
 
@@ -24,25 +25,25 @@ router.post("/login/:email", async (req, res, next) => {
         return next(ApiError.badRequest(errorM.WRONG_EMAIL));
     }
 
-    const authHeader = req.headers.authorization || req.headers.Authorization; 
+    const authHeader = req.headers.authorization || req.headers.Authorization;
     console.log(req.headers);
-    
-    try{
-        const {accessToken}=createUserTokens({user:email});
-        if(link.split("?").length>1){
-            link=`${link}&access=${accessToken}`;
-        }else{
+
+    try {
+        const { accessToken } = createUserTokens({ user: email });
+        if (link.split("?").length > 1) {
+            link = `${link}&access=${accessToken}`;
+        } else {
             const lastChar = link.charAt(link.length - 1);
-            if(lastChar==="/"){
-                link=`${link.substring(0,link.length-1)}?access=${accessToken}`
-            }else{
-                link=`${link}?access=${accessToken}`;   
+            if (lastChar === "/") {
+                link = `${link.substring(0, link.length - 1)}?access=${accessToken}`
+            } else {
+                link = `${link}?access=${accessToken}`;
             }
         }
-    
-    
+
+
         try {
-            const content=`<html lang="en">
+            const content = `<html lang="en">
             <head>
                 <style>
                     body {
@@ -114,8 +115,8 @@ router.post("/login/:email", async (req, res, next) => {
                 </div>
             </body>
             </html>`;
-    
-            await sendMail({ email, subject: "Цахим шуудан баталгаажуулах",content:content});
+
+            await sendMail({ email, subject: "Цахим шуудан баталгаажуулах", content: content });
             res.status(200).json({
                 status: 200,
                 description: "Mail Sent!!",
@@ -125,8 +126,52 @@ router.post("/login/:email", async (req, res, next) => {
             return next(ApiError.badRequest(errorM.ERR_EMAIL)); // Handle errors and return an appropriate response
         }
 
-    }catch(error){
+    } catch (error) {
         return next(ApiError.badRequest(errorM.ERR_SIGN_IN));
+    }
+});
+
+
+router.post("/check-access-get-refresh-token", async (req, res, next) => {
+    const token = req.headers.authorization;
+
+    try {   
+        if (!token) {
+            return next(ApiError.badRequest(errorM.ERR_TOKEN));
+        }
+
+        const decoded = jwt.decode(token);
+        const verify_res = verifyTokens(token);
+
+        if (verify_res.error) {
+            if (!verify_res.err.name === "TokenExpiredError") {
+                return next(ApiError.badRequest(errorM.RE_LOGIN));
+            }
+
+            const verify_ref_res = verifyRefreshToken(decoded.refreshToken);
+            console.log("ho");
+            if (verify_ref_res.error) {
+                console.log("hi");
+                if (verify_ref_res.err.name === "TokenExpiredError") {
+                    return next(ApiError.badRequest(errorM.RE_LOGIN));
+                } else {
+                    return next(ApiError.badRequest(errorM.ERR));
+                }
+            } else {
+                const accessToken = signAccessToken({
+                    user: verify_ref_res.decodedToken.user,
+                    refreshToken: decoded.refreshToken
+                });
+                res.status(200).json({
+                    status: 200,
+                    accessToken: accessToken
+                });
+            }
+        } else {
+            res.status(200).json({ success: true });
+        }
+    } catch (error) {
+        return next(ApiError.badRequest(errorM.ERR));
     }
 });
 

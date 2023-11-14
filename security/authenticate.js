@@ -28,7 +28,7 @@ const signRefreshToken = ({ user }) => {
       },
       process.env.REFRESH_TOKEN_SECRET,
       {
-        expiresIn: '2d'
+        expiresIn: '1d'
       }
     );
 
@@ -66,4 +66,14 @@ const verifyTokens = (token) => {
   });
 };
 
-module.exports = { createUserTokens, verifyTokens};
+const verifyRefreshToken = (token) => {
+  return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, decodedToken)=>{
+    if(err){
+      return {err, error:true};
+    }else{
+      return {decodedToken, error:false};
+    }
+  });
+};
+
+module.exports = { createUserTokens, verifyTokens, verifyRefreshToken, signAccessToken};
