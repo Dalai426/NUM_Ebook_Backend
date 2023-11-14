@@ -90,11 +90,11 @@ router.get("/epub/:id", async (req, res, next) => {
     if (!book) {
       return next(ApiError.badRequest(errorM.EMPTY_DATA));
     }
-
-    if(!token){
-      return next(ApiError.badRequest(errorM.ERR_TOKEN));
-    }
     if (book.prime) {
+      console.log("why");
+      if(!token){
+        return next(ApiError.badRequest(errorM.ERR_TOKEN));
+      }
       const verify_res = verifyTokens(token);
 
       if (verify_res.error) {
