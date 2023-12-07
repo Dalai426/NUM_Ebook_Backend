@@ -56,7 +56,7 @@ router.get("/convert-to-wav", async (req, res) => {
   console.log(text);
   try {
     const externalApiResponse = await axios.get(
-      `http://172.104.34.197/nlp-web-demo/tts?voice=1&text=${encodeURIComponent(
+      `http://172.104.34.197/nlp-web-demo/tts?voice=3&text=${encodeURIComponent(
         text
       )}`,
       { responseType: "arraybuffer" } // Ensure the response is treated as a binary buffer
